@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "277155273990",
+    "project_id": "nordstone-final",
+    "storage_bucket": "nordstone-final.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:277155273990:android:093e470faa75350b809287",
+        "android_client_info": {
+          "package_name": "com.nordstone_final"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0BhZBS0xZkRzs7ks-92_42GH63uVs4D8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
