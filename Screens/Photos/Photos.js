@@ -19,7 +19,10 @@ export default function Photos() {
   const [lastVisible, setLastVisible] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-
+  useEffect(() => {
+    console.log("invoked fecth")
+   fetchPhotos(true);
+  }, []);
   // Upload photo to Firebase
   const uploadPhoto = async (photo) => {
     try {
@@ -44,7 +47,7 @@ export default function Photos() {
       });
 
       alert('Photo uploaded successfully!');
-      fetchPhotos(true); // Refresh the photos list
+     fetchPhotos(true); // Refresh the photos list
     } catch (error) {
       console.error('Error uploading photo:', error);
       alert('Failed to upload photo');
@@ -53,7 +56,7 @@ export default function Photos() {
 
   // Fetch photos from Firestore
   const fetchPhotos = async (refresh = false) => {
-    if (loading || loadingMore) return;
+
     try {
       setLoading(refresh);
       setLoadingMore(!refresh);
@@ -104,9 +107,7 @@ export default function Photos() {
   };
 
   // Initial fetch
-  useEffect(() => {
-    fetchPhotos(true);
-  }, []);
+
 
   // Render Photo Item
   const renderPhotoItem = useCallback(({ item }) => {

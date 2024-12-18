@@ -1,174 +1,146 @@
-/* eslint-disable react-native/no-inline-styles */
-/* eslint-disable react/no-unstable-nested-components */
-import React, {useState} from 'react';
-import {Button, Text, TextInput, TouchableOpacity, View} from 'react-native';
-import axios from 'axios';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Alert,
+} from "react-native";
 
-const CalculatorButtonValue = [
-  1,
-  2,
-  3,
-  ' + ',
-  4,
-  5,
-  6,
-  ' - ',
-  7,
-  8,
-  9,
-  ' x ',
-  0,
-  'Clear',
-  'Enter',
-];
+const API_URL = "https://nordstone-backend.onrender.com/calculate";
+ // Backend URL
 
 const Calculator = () => {
-  const [textValue, setTextValue] = useState('');
-  const [operatorCount, setOperatorCount] = useState(0);
-  const [resultFromServer, setResultFromServer] = useState('');
-  const [xValue, setXValue] = useState(0);
-  const [yValue, setYValue] = useState(0);
-  async function getResultFromServer(x , y , operation ) {
-    await axios
-      .post('http://localhost:5000', {
-        x: x,
-        y: y,
-        operation: operation,
-      })
-      .then(res => {
-        console.log(res);
-        setResultFromServer(() => {
-          return res?.data?.result.toString();
-        });
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  }
-  function InputPanelCalculator(TextEntered) {
-    console.log(TextEntered.split(' '));
-    const splitedText = TextEntered.split(' ');
-    getResultFromServer(
-      Number(splitedText[0]),
-      Number(splitedText[2]),
-      splitedText[1],
-    );
-  }
-  const CalculatorButton = ({Value, Key, onClickButton, ButtonDisabled}) => {
-    return (
-      <View key={Key} style={{padding: 4}}>
-        <TouchableOpacity
-          style={[
-            {
-              height: 70,
-              width: 70,
-              backgroundColor: 'blue',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 10,
-            },
-            Value === 'Enter'
-              ? ButtonDisabled
-                ? {width: 150, backgroundColor: 'red'}
-                : {width: 150}
-              : {},
-          ]}
-          onPress={() => onClickButton()}
-          disabled={Value === 'Enter' && ButtonDisabled}>
-          <Text style={{color: 'black', fontSize: 20}}>{Value}</Text>
-        </TouchableOpacity>
-      </View>
-    );
+  const [input, setInput] = useState("");
+  const [result, setResult] = useState("");
+
+  const handlePress = (value) => {
+    setInput((prevInput) => prevInput + value);
   };
+
+  const handleClear = () => {
+    setInput("");
+    setResult("");
+  };
+
+  const handleCalculate = async () => {
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ expression: input }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Invalid Expression");
+      }
+
+      const data = await response.json();
+      setResult(data.result.toString());
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
+  const renderButton = (value) => (
+    <TouchableOpacity
+      style={styles.button}
+      onPress={() => handlePress(value)}
+    >
+      <Text style={styles.buttonText}>{value}</Text>
+    </TouchableOpacity>
+  );
+
   return (
-    <View style={{padding: 16}}>
-      {/* <TextInputn
-        style={{
-          height: 100,
-          width: '100%',
-          borderWidth: 2,
-          color: 'black',
-          textAlign: 'right',
-          marginVertical: 10,
-          borderRadius: 8,
-          textAlignVertical: 'bottom',
-        }}
-        editable={false}
-        value={textValue}
-      /> */}
-      <View>
-        <View style={{flexDirection: 'row'}}>
-         
-          <Text style={{color: 'black'}}>variable x : {xValue}</Text>
-        </View>
-        <View style={{flexDirection: 'row'}}>
-          
-          <Text style={{color: 'black'}}>variable y : {yValue}</Text>
-        </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.display}>
+        <Text style={styles.inputText}>{input}</Text>
+        <Text style={styles.resultText}>{result}</Text>
       </View>
-      <View
-        style={{
-          height: 40,
-          width: '100%',
-          borderWidth: 3,
-          backgroundColor: 'grey',
-        }}>
-        <Text style={{fontSize: 20, color: 'black'}}>
-          Result: {resultFromServer}
-        </Text>
+
+      <View style={styles.row}>
+        {renderButton("7")}
+        {renderButton("8")}
+        {renderButton("9")}
+        {renderButton("/")}
       </View>
-      {operatorCount > 1 && (
-        <View
-          style={{
-            height: 30,
-            width: '100%',
-            backgroundColor: 'red',
-            alignItems: 'flex-end',
-            padding: 4,
-            borderRadius: 6,
-          }}>
-          <Text style={{color: 'white'}}>
-            more than one operator Detected Count:{operatorCount}
-          </Text>
-        </View>
-      )}
-      <View style={{flexWrap: 'wrap', flexDirection: 'row', marginTop: 40}}>
-        {CalculatorButtonValue.map((item, index) => (
-          <CalculatorButton
-            Value={item}
-            key={index}
-            Key={index}
-            ButtonDisabled={operatorCount > 1}
-            onClickButton={() => {
-              if (
-                item.toString().trim() === '+' ||
-                item.toString().trim() === '-' ||
-                item.toString().trim() === 'x'
-              ) {
-                setOperatorCount(value => {
-                  return value + 1;
-                });
-              }
-              if (item.toString().toLowerCase() === 'clear') {
-                setTextValue(() => {
-                  return '';
-                });
-                setOperatorCount(() => {
-                  return 0;
-                });
-              } else if (item.toString().toLowerCase() === 'enter') {
-                InputPanelCalculator(textValue.toString());
-              } else {
-                setTextValue(value => {
-                  return `${value}${item}`;
-                });
-              }
-            }}
-          />
-        ))}
+      <View style={styles.row}>
+        {renderButton("4")}
+        {renderButton("5")}
+        {renderButton("6")}
+        {renderButton("*")}
       </View>
-    </View>
+      <View style={styles.row}>
+        {renderButton("1")}
+        {renderButton("2")}
+        {renderButton("3")}
+        {renderButton("-")}
+      </View>
+      <View style={styles.row}>
+        {renderButton("0")}
+        {renderButton(".")}
+        <TouchableOpacity style={styles.button} onPress={handleCalculate}>
+          <Text style={styles.buttonText}>=</Text>
+        </TouchableOpacity>
+        {renderButton("+")}
+      </View>
+      <TouchableOpacity style={[styles.button, styles.clearButton]} onPress={handleClear}>
+        <Text style={styles.buttonText}>C</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f4f4f4",
+    justifyContent: "center",
+    padding: 10,
+  },
+  display: {
+    backgroundColor: "#000",
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  inputText: {
+    color: "#fff",
+    fontSize: 24,
+    textAlign: "right",
+  },
+  resultText: {
+    color: "#00e676",
+    fontSize: 32,
+    textAlign: "right",
+    marginTop: 10,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  button: {
+    flex: 1,
+    height: 60,
+    margin: 5,
+    backgroundColor: "#6200ee",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  clearButton: {
+    backgroundColor: "#d50000",
+    marginTop: 20,
+  },
+});
 
 export default Calculator;
