@@ -10,9 +10,10 @@ import ForgotPassword from "../Screens/ForgotPassword/ForgotPassword";
 
 import ProfileTabTitle from "../components/ProfileTabTitle/ProfileTabTitle";
 import ProfileTabContent from "../components/ProfileTabContent/ProfileTabComponent";
-import { Notification } from "../Screens/Notification/Notification";
+import  Notification from "../Screens/Notification/Notification";
 import TextUpload from "../Screens/TextUpload/TextUpload";
 import Calculator from "../Screens/Calculator/Calculator";
+import Photos from "../Screens/Photos/Photos";
 
 
 
@@ -46,7 +47,7 @@ export const ProfileTabsNavigation = () => {
             options={{
                 tabBarLabel: ({focused}) => <ProfileTabTitle isFocused={focused} title={'Photos'} />
             }}
-            component={ProfileTabContent}/>
+            component={Photos}/>
             <ProfileTabs.Screen
             name={'Tab3'}
             options={{
